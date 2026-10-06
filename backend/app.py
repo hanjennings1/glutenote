@@ -6,11 +6,14 @@ Run from backend/ with the virtual environment active:
 The API then runs at http://localhost:5555
 
 Routes so far:
-  GET    /recipes          list all recipes (optional ?status= filter)
-  GET    /recipes/<id>     one recipe, including its ingredients
-  POST   /recipes          create a recipe (optionally with ingredients)
-  PATCH  /recipes/<id>     update some fields of a recipe
-  DELETE /recipes/<id>     delete a recipe (and its ingredients, via cascade)
+    GET    /recipes          list all recipes (optional ?status= filter)
+    GET    /recipes/<id>     one recipe, including its ingredients
+    POST   /recipes          create a recipe (optionally with ingredients)
+    PATCH  /recipes/<id>     update some fields of a recipe
+    DELETE /recipes/<id>     delete a recipe (and its ingredients, via cascade)
+    POST   /ingredients        add an ingredient to a recipe (needs recipe_id)
+    PATCH  /ingredients/<id>   update an ingredient (e.g. record a GF substitute)
+    DELETE /ingredients/<id>   delete an ingredient
 
 Error responses always use the shape {"error": "message"}
 so the React frontend can display them the same way everywhere.
@@ -141,6 +144,76 @@ def delete_recipe(id):
     db.session.delete(recipe)
     db.session.commit()
     return {}, 204  # 204 = No Content (success, nothing to return)
+
+
+# ---------- Ingredients ----------
+# Ingredients are read through GET /recipes/<id>, which includes them,
+# so these routes cover create, update, and delete.
+
+# Fields the frontend is allowed to set on an ingredient.
+# recipe_id is left out on purpose: an ingredient can't be moved to another recipe.
+INGREDIENT_FIELDS = ["name", "amount", "contains_gluten", "gf_substitute"]
+
+
+@app.route("/ingredients", methods=["POST"])
+def create_ingredient():
+    data = request.get_json(silent=True)
+    if not data:
+        return {"error": "Request body must be JSON"}, 400
+
+    # The ingredient must belong to a recipe that exists.
+    recipe = db.session.get(Recipe, data.get("recipe_id"))
+    if not recipe:
+        return {"error": "A valid recipe_id is required"}, 400
+    if not data.get("name"):
+        return {"error": "Ingredient name is required"}, 400
+    if "contains_gluten" in data and not isinstance(data["contains_gluten"], bool):
+        return {"error": "contains_gluten must be true or false"}, 400
+
+    ingredient = Ingredient(
+        recipe_id=recipe.id,
+        name=data["name"],
+        amount=data.get("amount"),
+        contains_gluten=data.get("contains_gluten", False),
+        gf_substitute=data.get("gf_substitute"),
+    )
+    db.session.add(ingredient)
+    db.session.commit()
+    return ingredient.to_dict(), 201
+
+
+@app.route("/ingredients/<int:id>", methods=["PATCH"])
+def update_ingredient(id):
+    ingredient = db.session.get(Ingredient, id)
+    if not ingredient:
+        return {"error": "Ingredient not found"}, 404
+
+    data = request.get_json(silent=True)
+    if not data:
+        return {"error": "Request body must be JSON"}, 400
+    if "name" in data and not data["name"]:
+        return {"error": "Ingredient name cannot be empty"}, 400
+    if "contains_gluten" in data and not isinstance(data["contains_gluten"], bool):
+        return {"error": "contains_gluten must be true or false"}, 400
+
+    # Only update the fields that were sent. This is the route the
+    # Recipe Detail page will use to save a gluten-free substitute.
+    for field in INGREDIENT_FIELDS:
+        if field in data:
+            setattr(ingredient, field, data[field])
+    db.session.commit()
+    return ingredient.to_dict(), 200
+
+
+@app.route("/ingredients/<int:id>", methods=["DELETE"])
+def delete_ingredient(id):
+    ingredient = db.session.get(Ingredient, id)
+    if not ingredient:
+        return {"error": "Ingredient not found"}, 404
+
+    db.session.delete(ingredient)
+    db.session.commit()
+    return {}, 204
 
 
 if __name__ == "__main__":
