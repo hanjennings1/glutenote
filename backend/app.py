@@ -5,15 +5,19 @@ Run from backend/ with the virtual environment active:
   python app.py
 The API then runs at http://localhost:5555
 
-Routes so far:
-    GET    /recipes          list all recipes (optional ?status= filter)
-    GET    /recipes/<id>     one recipe, including its ingredients
-    POST   /recipes          create a recipe (optionally with ingredients)
-    PATCH  /recipes/<id>     update some fields of a recipe
-    DELETE /recipes/<id>     delete a recipe (and its ingredients, via cascade)
-    POST   /ingredients        add an ingredient to a recipe (needs recipe_id)
-    PATCH  /ingredients/<id>   update an ingredient (e.g. record a GF substitute)
-    DELETE /ingredients/<id>   delete an ingredient
+Routes:
+  GET    /recipes            list all recipes (optional ?status= filter)
+  GET    /recipes/<id>       one recipe, including its ingredients
+  POST   /recipes            create a recipe (optionally with ingredients)
+  PATCH  /recipes/<id>       update some fields of a recipe
+  DELETE /recipes/<id>       delete a recipe (and its ingredients, via cascade)
+
+  POST   /ingredients        add an ingredient to a recipe (needs recipe_id)
+  PATCH  /ingredients/<id>   update an ingredient (e.g. record a GF substitute)
+  DELETE /ingredients/<id>   delete an ingredient
+
+  GET    /search?q=          search TheMealDB; returns previews with gluten flags (nothing saved)
+  POST   /recipes/import     fetch a recipe from TheMealDB, flag gluten, and save it
 
 Error responses always use the shape {"error": "message"}
 so the React frontend can display them the same way everywhere.
@@ -24,10 +28,11 @@ from sqlalchemy.exc import IntegrityError
 
 from config import app, db
 from models import Recipe, Ingredient, GF_STATUSES
+from mealdb import search_meals, lookup_meal, parse_meal, MealDBError
 
 # Fields the frontend is allowed to set on a recipe.
 # Anything else in the request body (like "id") is ignored,
-# so users cannot overwrite fields they shouldn't control.
+# so users can't overwrite fields they shouldn't control.
 RECIPE_FIELDS = ["title", "instructions", "image_url", "source", "mealdb_id", "gf_status", "notes"]
 
 
@@ -69,9 +74,8 @@ def create_recipe():
         # Copy only the allowed fields that were actually sent.
         recipe = Recipe(**{f: data[f] for f in RECIPE_FIELDS if f in data})
 
-        # Optional: create ingredients in the same request.
-        # Used when importing from TheMealDB, so the recipe and its
-        # ingredients are saved together in one step.
+        # Optional: create ingredients in the same request,
+        # so a custom recipe and its ingredients are saved in one step.
         for item in data.get("ingredients", []):
             if not item.get("name"):
                 return {"error": "Each ingredient needs a name"}, 400
@@ -214,6 +218,78 @@ def delete_ingredient(id):
     db.session.delete(ingredient)
     db.session.commit()
     return {}, 204
+
+
+# ---------- TheMealDB: search and import ----------
+
+@app.route("/search", methods=["GET"])
+def search():
+    # e.g. /search?q=lasagne
+    query = request.args.get("q", "").strip()
+    if not query:
+        return {"error": "Please enter a search term"}, 400
+
+    try:
+        meals = search_meals(query)
+    except MealDBError as e:
+        return {"error": str(e)}, 502  # 502 = an outside service failed
+
+    previews = [parse_meal(meal) for meal in meals]
+
+    # Mark results that are already in the collection,
+    # so the Search page can show "Saved" instead of a Save button.
+    ids = [p["mealdb_id"] for p in previews]
+    saved_ids = {
+        r.mealdb_id for r in Recipe.query.filter(Recipe.mealdb_id.in_(ids)).all()
+    } if ids else set()
+    for p in previews:
+        p["saved"] = p["mealdb_id"] in saved_ids
+
+    # An empty list (no matches) is still a successful search.
+    return previews, 200
+
+
+@app.route("/recipes/import", methods=["POST"])
+def import_recipe():
+    data = request.get_json(silent=True) or {}
+    mealdb_id = str(data.get("mealdb_id") or "").strip()
+    if not mealdb_id:
+        return {"error": "mealdb_id is required"}, 400
+
+    # Check for a duplicate before calling TheMealDB, to save a request.
+    if Recipe.query.filter_by(mealdb_id=mealdb_id).first():
+        return {"error": "This recipe is already in your collection"}, 409
+
+    try:
+        meal = lookup_meal(mealdb_id)
+    except MealDBError as e:
+        return {"error": str(e)}, 502
+    if not meal:
+        return {"error": "Recipe not found in TheMealDB"}, 404
+
+    # Convert TheMealDB's format, flag gluten, and pick the starting status.
+    parsed = parse_meal(meal)
+    recipe = Recipe(
+        title=parsed["title"],
+        instructions=parsed["instructions"],
+        image_url=parsed["image_url"],
+        source="mealdb",
+        mealdb_id=parsed["mealdb_id"],
+        gf_status=parsed["gf_status"],
+    )
+    for item in parsed["ingredients"]:
+        recipe.ingredients.append(Ingredient(**item))
+
+    try:
+        db.session.add(recipe)
+        db.session.commit()
+    except IntegrityError:
+        # Backup check: the database's unique rule on mealdb_id
+        # catches a duplicate that slipped past the check above.
+        db.session.rollback()
+        return {"error": "This recipe is already in your collection"}, 409
+
+    return recipe.to_dict(), 201
 
 
 if __name__ == "__main__":

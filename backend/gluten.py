@@ -5,8 +5,8 @@ Used when previewing TheMealDB search results and when importing a recipe.
 The rules here match the "Gluten Flagging Rules" section of the project pitch.
 
 This is a keyword check, so it is a helpful guide, NOT a guarantee.
-Users can turn any flag on or off in the app, 
-and the app reminds them to always check product labels.
+Users can turn any flag on or off in the app, and the app reminds them
+to always check product labels.
 
 Quick test (from backend/ with the venv active):
   python -c "from gluten import may_contain_gluten as g; print(g('Plain Flour'), g('Rice Flour'), g('Kale'))"
@@ -20,6 +20,9 @@ import re
 GLUTEN_KEYWORDS = [
     "flour", "wheat", "bread", "breadcrumbs", "panko",
     "pasta", "spaghetti", "macaroni", "lasagne", "noodles",
+    "penne", "linguine", "fettuccine", "tagliatelle", "rigatoni",
+    "farfalle", "fusilli", "orzo", "ravioli", "tortellini", "gnocchi",
+    "baguette", "ciabatta", "brioche", "naan", "bun",
     "couscous", "bulgur", "semolina", "barley", "rye",
     "spelt", "farro", "seitan", "pastry", "filo",
     "tortilla", "pita", "cracker", "biscuit",
