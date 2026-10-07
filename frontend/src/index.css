@@ -1,0 +1,27 @@
+@import "tailwindcss";
+ 
+/*
+  Glutenote color palette.
+  Each --color-NAME below creates Tailwind classes such as
+  text-NAME, bg-NAME, and border-NAME (e.g. bg-fern, text-ink).
+*/
+@theme {
+  /* Brand palette */
+  --color-fern: #3f784c;            /* primary: title, buttons, links, "naturally gluten-free" */
+  --color-pale-amber: #e1e289;      /* highlight: "needs adapting" badge (use with ink text) */
+  --color-burnt-rose: #8e3b46;      /* gluten flags and error messages */
+  --color-pale-slate: #cfccd6;      /* borders and dividers */
+  --color-ink: #04151f;             /* main text */
+ 
+  /* Supporting tints and neutrals */
+  --color-fern-light: #eef4ef;      /* soft fern background, e.g. "adapted" badge */
+  --color-burnt-rose-light: #f8ebed;/* soft background behind errors and flagged ingredients */
+  --color-ink-muted: #4a5560;       /* secondary text: captions, labels, helper text */
+  --color-canvas: #f7f6f9;          /* page background behind white cards */
+}
+ 
+/* App-wide defaults */
+body {
+  @apply bg-canvas text-ink antialiased;
+}
+ 
