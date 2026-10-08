@@ -35,7 +35,7 @@ export default function NavBar() {
             My Recipes
           </NavLink>
           <NavLink to="/search" className={navLinkClass}>
-            Search
+            Find Recipes
           </NavLink>
           {/* White button on the pine header, so it reads as the main action */}
           <Link
