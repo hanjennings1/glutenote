@@ -1,27 +1,73 @@
 @import "tailwindcss";
- 
+
 /*
-  Glutenote color palette.
-  Each --color-NAME below creates Tailwind classes such as
-  text-NAME, bg-NAME, and border-NAME (e.g. bg-fern, text-ink).
+  Glutenote theme:
+  Each line below gives a color, font, corner radius, or shadow a NAME.
+  Tailwind turns each name into ready-to-use classes, for example:
+    --color-primary  ->  bg-primary, text-primary, border-primary
+    --radius-lg      ->  rounded-lg
+    --shadow-card    ->  shadow-card
+  To change a color everywhere in the app, change its value here once.
 */
+
 @theme {
-  /* Brand palette */
-  --color-fern: #3f784c;            /* primary: title, buttons, links, "naturally gluten-free" */
-  --color-pale-amber: #e1e289;      /* highlight: "needs adapting" badge (use with ink text) */
-  --color-burnt-rose: #8e3b46;      /* gluten flags and error messages */
-  --color-pale-slate: #cfccd6;      /* borders and dividers */
-  --color-ink: #04151f;             /* main text */
- 
-  /* Supporting tints and neutrals */
-  --color-fern-light: #eef4ef;      /* soft fern background, e.g. "adapted" badge */
-  --color-burnt-rose-light: #f8ebed;/* soft background behind errors and flagged ingredients */
-  --color-ink-muted: #4a5560;       /* secondary text: captions, labels, helper text */
-  --color-canvas: #f7f6f9;          /* page background behind white cards */
+  /* Replace Tailwind's default grays with the guide's green-tinted grays */
+  --color-gray-*: initial;
+
+  /* ---- Brand: pine green ---- */
+  --color-pine-900: #1a2b1a; /* pressed */
+  --color-pine-800: #243a24; /* MAIN COLOR */
+  --color-pine-700: #2f4a2f; /* hover */
+  --color-pine-600: #3a5a3a; /* links */
+  --color-pine-100: #e4ebdf; /* "Naturally GF" badge background */
+  --color-pine-50: #f2f6ef;  /* light hover wash */
+
+  /* ---- Gluten flags: bordeaux (means "contains gluten" ONLY) ---- */
+  --color-bordeaux-800: #5e1724; /* text on the flag tint */
+  --color-bordeaux-700: #7a1f30; /* flagged ingredient text, flag icons */
+  --color-bordeaux-100: #f5e1e5; /* "Needs adapting" badge, flagged row */
+
+  /* ---- Neutrals ---- */
+  --color-gray-50: #f7f8f6;  /* inputs, notes box */
+  --color-gray-100: #eef0ec; /* dividers */
+  --color-gray-200: #e2e5e0; /* borders, chip outlines */
+  --color-gray-400: #97a49a; /* icons only, never text */
+  --color-gray-500: #8a918c; /* placeholders and captions only */
+  --color-gray-600: #5c645e; /* secondary text */
+  --color-gray-900: #1f2420; /* main text */
+
+  /* ---- App errors (separate from gluten flags) ---- */
+  --color-error: #b42318;
+  --color-error-bg: #fef3f2;
+
+  /* ---- Role names: use these in components ---- */
+  --color-primary: #243a24;         /* buttons, header, active chip, "Adapted" badge */
+  --color-primary-hover: #2f4a2f;
+  --color-primary-pressed: #1a2b1a;
+  --color-link: #3a5a3a;
+  --color-flag: #7a1f30;            /* flagged ingredient text and icons */
+  --color-flag-bg: #f5e1e5;         /* flag tint background */
+  --color-flag-text: #5e1724;       /* text on the flag tint */
+  --color-ink: #1f2420;             /* main text */
+  --color-ink-secondary: #5c645e;   /* secondary text */
+  --color-ink-muted: #8a918c;       /* placeholders and captions only */
+  --color-border: #e2e5e0;
+  --color-divider: #eef0ec;
+  --color-subtle: #f7f8f6;          /* subtle backgrounds: inputs, notes */
+
+  /* ---- Type ---- */
+  --font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* ---- Shape ---- */
+  --radius-sm: 8px;  /* inputs, small buttons */
+  --radius-md: 12px; /* buttons, list cards */
+  --radius-lg: 16px; /* recipe cards */
+  /* Pills (chips, badges) use Tailwind's built-in rounded-full */
+
+  --shadow-card: 0 1px 2px rgba(31, 36, 32, 0.06), 0 4px 12px rgba(31, 36, 32, 0.04);
 }
- 
-/* App-wide defaults */
+
+/* App-wide defaults: white page, DM Sans, main text color */
 body {
-  @apply bg-canvas text-ink antialiased;
+  @apply bg-white font-sans text-ink antialiased;
 }
- 

@@ -5,7 +5,7 @@ Run from backend/ with the virtual environment active:
   python seed.py
 
 WARNING: This deletes ALL existing recipes and ingredients first,
-so only use it on your development database.
+so only use it on the development database.
 
 Includes one recipe for each gluten-free status, so the
 status filter can be tested:
