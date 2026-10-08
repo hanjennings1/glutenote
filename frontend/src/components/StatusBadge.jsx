@@ -11,7 +11,7 @@ export default function StatusBadge({ status, swapsNeeded = 0 }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-[3px] text-xs font-medium ${config.className}`}
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.75 text-xs font-medium ${config.className}`}
     >
       <Icon size={13} aria-hidden="true" />
       {config.label}
