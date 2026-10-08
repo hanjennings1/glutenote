@@ -87,6 +87,12 @@ class Recipe(db.Model):
             "mealdb_id": self.mealdb_id,
             "gf_status": self.gf_status,
             "notes": self.notes,
+            # How many flagged ingredients still have no gluten-free swap.
+            # Shown on the "Needs adapting · 2" badge in the recipe list.
+            # Calculated each time, so it's never out of date (not stored in the database).
+            "swaps_needed": sum(
+                1 for i in self.ingredients if i.contains_gluten and not i.gf_substitute
+            ),
         }
         if include_ingredients:
             data["ingredients"] = [i.to_dict() for i in self.ingredients]

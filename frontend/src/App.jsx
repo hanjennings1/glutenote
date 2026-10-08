@@ -1,6 +1,5 @@
 // App.jsx — TEMPORARY connection test.
 // Loads recipes from the Flask API to prove the frontend and backend can talk.
-// This file will be replaced with React Router and the real pages on Thursday.
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "./api";
@@ -26,20 +25,20 @@ export default function App() {
 
   return (
     <main className="mx-auto max-w-2xl p-6 text-ink">
-      <h1 className="text-3xl font-bold text-fern">Glutenote</h1>
-      <p className="mb-6 text-ink-muted">Connection test: recipes from the Flask API</p>
+      <h1 className="text-3xl font-medium text-primary">Glutenote</h1>
+      <p className="mb-6 text-ink-secondary">Connection test: recipes from the Flask API</p>
 
-      {loading && <p className="text-ink-muted">Loading recipes…</p>}
+      {loading && <p className="text-ink-secondary">Loading recipes…</p>}
 
       {error && (
-        <p className="rounded-md bg-burnt-rose-light p-3 text-burnt-rose">{error}</p>
+        <p className="rounded-md bg-error-bg p-3 text-error">{error}</p>
       )}
 
       <ul className="space-y-3">
         {recipes.map((recipe) => (
-          <li key={recipe.id} className="rounded-lg border border-pale-slate bg-white p-4 shadow-sm">
-            <h2 className="text-lg font-semibold">{recipe.title}</h2>
-            <p className="text-sm text-ink-muted">{STATUS_LABELS[recipe.gf_status]}</p>
+          <li key={recipe.id} className="rounded-lg border border-border bg-white p-4 shadow-card">
+            <h2 className="text-lg font-medium">{recipe.title}</h2>
+            <p className="text-sm text-ink-secondary">{STATUS_LABELS[recipe.gf_status]}</p>
           </li>
         ))}
       </ul>
