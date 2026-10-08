@@ -98,7 +98,7 @@ export default function RecipeDetail() {
 
       {/* ---- Top: photo + title, status, actions ---- */}
       <header className="grid gap-6 md:grid-cols-[2fr_3fr] md:items-start">
-        <div className="aspect-[4/3] overflow-hidden rounded-lg bg-pine-50">
+        <div className="aspect-4/3 overflow-hidden rounded-lg bg-pine-50">
           {recipe.image_url ? (
             <img src={recipe.image_url} alt="" className="size-full object-cover" />
           ) : (
@@ -200,7 +200,7 @@ function BackLink() {
       className="inline-flex items-center gap-1 rounded-sm text-sm font-medium text-link hover:underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       <ChevronLeft size={16} aria-hidden="true" />
-      My recipes
+      My Recipes
     </Link>
   );
 }

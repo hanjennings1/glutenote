@@ -16,7 +16,7 @@ export default function RecipeCard({ recipe }) {
       to={`/recipes/${recipe.id}`}
       className="group block overflow-hidden rounded-lg border border-border bg-white shadow-card transition-colors hover:border-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
-      <div className="aspect-[4/3] bg-pine-50">
+      <div className="aspect-4/3 bg-pine-50">
         {showImage ? (
           <img
             src={recipe.image_url}

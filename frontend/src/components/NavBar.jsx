@@ -32,7 +32,7 @@ export default function NavBar() {
         <div className="flex items-center gap-5">
           {/* "end" makes My recipes active only on "/", not on every page */}
           <NavLink to="/" end className={navLinkClass}>
-            My recipes
+            My Recipes
           </NavLink>
           <NavLink to="/search" className={navLinkClass}>
             Search

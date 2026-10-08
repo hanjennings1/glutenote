@@ -9,7 +9,7 @@ export default function NotFound() {
       <p className="mt-2 text-ink-secondary">
         This page doesn’t exist.{" "}
         <Link to="/" className="font-medium text-link underline underline-offset-2">
-          Go to My recipes
+          Go to My Recipes
         </Link>
       </p>
     </section>

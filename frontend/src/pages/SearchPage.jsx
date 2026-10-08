@@ -53,7 +53,7 @@ export default function SearchPage() {
 
   return (
     <section>
-      <h1 className="text-[1.75rem] font-medium leading-tight">Find recipes</h1>
+      <h1 className="text-[1.75rem] font-medium leading-tight">Find Recipes</h1>
       <p className="mt-1 text-ink-secondary">
         Search TheMealDB, then save a recipe to adapt it.
       </p>

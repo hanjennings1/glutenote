@@ -52,7 +52,7 @@ export default function RecipeList() {
   return (
     <section>
       <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
-        <h1 className="text-[1.75rem] font-medium leading-tight">My recipes</h1>
+        <h1 className="text-[1.75rem] font-medium leading-tight">My Recipes</h1>
         {!loading && !error && (
           <p className="text-sm text-ink-secondary">
             {recipes.length} {recipes.length === 1 ? "recipe" : "recipes"}
