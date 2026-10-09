@@ -57,6 +57,7 @@
 
   /* ---- Type ---- */
   --font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif; /* the GLUTENOTE name only */
 
   /* ---- Shape ---- */
   --radius-sm: 8px;  /* inputs, small buttons */
