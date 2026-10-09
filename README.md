@@ -94,7 +94,7 @@ Open http://localhost:5173 in your browser.
 ## Usage
 
 1. **Find a recipe:** go to **Find Recipes**, search for a dish (e.g., "lasagne"), and click **Save recipe**.
-2. **Adapt it:** on the recipe page, flagged ingredients are marked in red. Click **Add swap** to record a gluten-free substitute.
+2. **Adapt it:** on the recipe page, flagged ingredients are marked with a wheat icon. Click **Add swap** to record a gluten-free substitute.
 3. **Mark it adapted:** once every flagged ingredient has a swap, click **Mark as adapted**.
 4. **Add a family recipe:** click **Add recipe**, fill in the basics, then add ingredients on the next page.
 5. **Filter:** on **My Recipes**, filter by status to see what still needs adapting.
