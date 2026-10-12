@@ -28,6 +28,8 @@ const SORTS = [
   { value: "newest", label: "Newest first" },
   { value: "oldest", label: "Oldest first" },
   { value: "title", label: "Title (A–Z)" },
+  { value: "rating", label: "Highest rated" },
+
 ];
 
 // 12 fills four rows of three cards on a wide screen.
