@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CookingPot } from "lucide-react";
 import StatusBadge from "./StatusBadge";
+import StarRating from "./StarRating";
 
 export default function RecipeCard({ recipe }) {
   // If the photo is missing or fails to load, show a simple placeholder instead.
@@ -36,7 +37,11 @@ export default function RecipeCard({ recipe }) {
         <h2 className="text-base font-medium leading-snug group-hover:underline group-hover:underline-offset-2">
           {recipe.title}
         </h2>
-        <StatusBadge status={recipe.gf_status} swapsNeeded={recipe.swaps_needed} />
+        {/* Status badge, plus small stars once the recipe is rated */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <StatusBadge status={recipe.gf_status} swapsNeeded={recipe.swaps_needed} />
+          {recipe.rating && <StarRating value={recipe.rating} size={14} />}
+        </div>
         <p className="text-sm text-ink-secondary">
           {recipe.source === "mealdb" ? "From TheMealDB" : "Family recipe"}
         </p>

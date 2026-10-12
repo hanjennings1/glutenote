@@ -15,6 +15,7 @@ import ErrorMessage from "../components/ErrorMessage";
 import StatusPicker from "../components/StatusPicker";
 import IngredientList from "../components/IngredientList";
 import NotesEditor from "../components/NotesEditor";
+import StarRating from "../components/StarRating";
 
 export default function RecipeDetail() {
   const { id } = useParams(); // the :id from the address, e.g. /recipes/3
@@ -36,7 +37,7 @@ export default function RecipeDetail() {
     };
   }, [id, requestKey]);
 
-  // Status changes and recipe deletion
+  // Status and rating changes, and recipe deletion
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -58,15 +59,16 @@ export default function RecipeDetail() {
     setResult((r) => ({ ...r, recipe: { ...r.recipe, ...changes } }));
   }
 
-  async function changeStatus(gf_status) {
+  // Save the status and/or rating with PATCH, e.g. saveRecipe({ rating: 4 }).
+  async function saveRecipe(changes) {
     setBusy(true);
     setActionError(null);
     try {
       const updated = await apiFetch(`/recipes/${recipe.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ gf_status }),
+        body: JSON.stringify(changes),
       });
-      updateRecipe({ gf_status: updated.gf_status });
+      updateRecipe({ gf_status: updated.gf_status, rating: updated.rating });
     } catch (err) {
       setActionError(err.message);
     } finally {
@@ -118,12 +120,30 @@ export default function RecipeDetail() {
 
           <div className="space-y-2">
             <p className="text-sm font-medium text-ink">Status</p>
-            <StatusPicker value={recipe.gf_status} onChange={changeStatus} disabled={busy} />
+            <StatusPicker value={recipe.gf_status} onChange={(gf_status) => saveRecipe({ gf_status })} disabled={busy} />
             {swapsNeeded > 0 && (
               <p className="text-sm text-ink-secondary">
                 {swapsNeeded} {swapsNeeded === 1 ? "ingredient needs" : "ingredients need"} a gluten-free swap.
               </p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-ink">Your rating</p>
+            <div className="flex items-center gap-3">
+              <StarRating
+                value={recipe.rating}
+                onChange={(rating) => saveRecipe({ rating })}
+                disabled={busy}
+              />
+              {recipe.rating ? (
+                <button type="button" onClick={() => saveRecipe({ rating: null })} disabled={busy} className={btn.text}>
+                  Clear
+                </button>
+              ) : (
+                <span className="text-sm text-ink-secondary">Not rated yet</span>
+              )}
+            </div>
           </div>
 
           {actionError && <ErrorMessage message={actionError} />}
@@ -161,7 +181,7 @@ export default function RecipeDetail() {
           <p className="flex-1 text-sm text-ink">
             <span className="font-medium">All swaps added.</span> Mark this recipe as adapted?
           </p>
-          <button type="button" onClick={() => changeStatus("adapted")} disabled={busy} className={btn.primary}>
+          <button type="button" onClick={() => saveRecipe({ gf_status: "adapted" })} disabled={busy} className={btn.primary}>
             Mark as adapted
           </button>
         </div>
