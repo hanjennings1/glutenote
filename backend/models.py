@@ -53,6 +53,9 @@ class Recipe(db.Model):
     # The user's personal notes, e.g. "used 1:1 GF flour, came out great."
     notes = db.Column(db.Text)
 
+    # The user's rating for the recipe (1-5), None until it's been rated
+    rating = db.Column(db.Integer, nullable=True)
+
     # Set automatically by the database when the row is created.
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
@@ -74,6 +77,16 @@ class Recipe(db.Model):
             raise ValueError(f"gf_status must be one of {GF_STATUSES}")
         return value
 
+    # Runs every time rating is set; None clears the rating
+    # bool is checked separately since Python treats True=1
+    @validates("rating")
+    def validates_rating(self, key, value):
+        if value is None:
+            return None
+        if isinstance(value, bool) or not isinstance(value, int) or not 1<= value <= 5:
+            raise ValueError("rating must be a whole number from 1 to 5, or null to clear it")
+        return value
+
     # Converts a Recipe into a plain dictionary so Flask can return it as JSON.
     # include_ingredients=False is used for the recipe list page,
     # which doesn't need every ingredient and keeps responses smaller.
@@ -87,6 +100,7 @@ class Recipe(db.Model):
             "mealdb_id": self.mealdb_id,
             "gf_status": self.gf_status,
             "notes": self.notes,
+            "rating": self.rating,
             # How many flagged ingredients still have no gluten-free swap.
             # Shown on the "Needs adapting · 2" badge in the recipe list.
             # Calculated each time, so it's never out of date (not stored in the database).

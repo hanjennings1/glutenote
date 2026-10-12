@@ -34,13 +34,14 @@ from mealdb import search_meals, lookup_meal, parse_meal, MealDBError
 # Fields the frontend is allowed to set on a recipe.
 # Anything else in the request body (like "id") is ignored,
 # so users can't overwrite fields they shouldn't control.
-RECIPE_FIELDS = ["title", "instructions", "image_url", "source", "mealdb_id", "gf_status", "notes"]
+RECIPE_FIELDS = ["title", "instructions", "image_url", "source", "mealdb_id", "gf_status", "notes", "rating"]
 
 # Sort choices for GET /recipes?sort=  (each maps to the ORDER BY columns)
 SORT_OPTIONS = {
     "newest": (Recipe.created_at.desc(), Recipe.id.desc()),
     "oldest": (Recipe.created_at.asc(), Recipe.id.asc()),
     "title": (Recipe.title.asc(), Recipe.id.asc()),
+    "rating": (Recipe.rating.desc().nulls_last(), Recipe.created_at.desc(), Recipe.id.desc()),
 }
 
 # Pagination defaults for GET /recipes
