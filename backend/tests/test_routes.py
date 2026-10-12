@@ -57,7 +57,7 @@ def test_filter_recipes_by_status(client):
 
     response = client.get("/recipes?status=naturally_gf")
 
-    titles = [r["title"] for r in response.get_json()]
+    titles = [r["title"] for r in response.get_json()["recipes"]]
     assert response.status_code == 200
     assert titles == ["Shakshuka"]
 

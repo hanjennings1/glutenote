@@ -6,7 +6,8 @@ Run from backend/ with the virtual environment active:
 The API then runs at http://localhost:5555
 
 Routes:
-  GET    /recipes            list all recipes (optional ?status= filter)
+  GET    /recipes            list recipes, one page at a time
+                             (optional ?status=, ?q=, ?sort=, ?page=, ?per_page=)
   GET    /recipes/<id>       one recipe, including its ingredients
   POST   /recipes            create a recipe (optionally with ingredients)
   PATCH  /recipes/<id>       update some fields of a recipe
@@ -35,6 +36,17 @@ from mealdb import search_meals, lookup_meal, parse_meal, MealDBError
 # so users can't overwrite fields they shouldn't control.
 RECIPE_FIELDS = ["title", "instructions", "image_url", "source", "mealdb_id", "gf_status", "notes"]
 
+# Sort choices for GET /recipes?sort=  (each maps to the ORDER BY columns)
+SORT_OPTIONS = {
+    "newest": (Recipe.created_at.desc(), Recipe.id.desc()),
+    "oldest": (Recipe.created_at.asc(), Recipe.id.asc()),
+    "title": (Recipe.title.asc(), Recipe.id.asc()),
+}
+
+# Pagination defaults for GET /recipes
+DEFAULT_PER_PAGE = 12
+MAX_PER_PAGE = 50
+
 
 @app.route("/")
 def index():
@@ -46,19 +58,50 @@ def index():
 
 @app.route("/recipes", methods=["GET"])
 def get_recipes():
-    # Optional filter, e.g. /recipes?status=adapted
-    status = request.args.get("status")
+    # Supports filtering, searching, sorting, and pagination, all optional:
+    #   /recipes?status=adapted&q=bread&sort=title&page=2&per_page=12
     query = Recipe.query
 
+    # Filter by gluten-free status
+    status = request.args.get("status")
     if status:
         if status not in GF_STATUSES:
             return {"error": f"status must be one of {GF_STATUSES}"}, 400
         query = query.filter_by(gf_status=status)
 
-    # Newest first. include_ingredients=False keeps the list response small,
+    # Search by title (case-insensitive, matches anywhere in the title)
+    search = request.args.get("q", "").strip()
+    if search:
+        query = query.filter(Recipe.title.ilike(f"%{search}%"))
+
+    # Sort. Recipe.id is a tiebreaker, so recipes saved in the same second
+    # always come back in the same order (important for stable pages).
+    sort = request.args.get("sort", "newest")
+    if sort not in SORT_OPTIONS:
+        return {"error": f"sort must be one of {list(SORT_OPTIONS)}"}, 400
+    query = query.order_by(*SORT_OPTIONS[sort])
+
+    # Paginate. Page numbers start at 1.
+    try:
+        page = int(request.args.get("page", 1))
+        per_page = int(request.args.get("per_page", DEFAULT_PER_PAGE))
+    except ValueError:
+        return {"error": "page and per_page must be whole numbers"}, 400
+    if page < 1 or not 1 <= per_page <= MAX_PER_PAGE:
+        return {"error": f"page must be 1 or more, and per_page between 1 and {MAX_PER_PAGE}"}, 400
+
+    # error_out=False returns an empty page (instead of a 404) if page is past the end
+    result = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    # include_ingredients=False keeps the list response small,
     # since the My Recipes page only needs titles, images, and statuses.
-    recipes = query.order_by(Recipe.created_at.desc()).all()
-    return [r.to_dict(include_ingredients=False) for r in recipes], 200
+    return {
+        "recipes": [r.to_dict(include_ingredients=False) for r in result.items],
+        "page": page,
+        "per_page": per_page,
+        "total": result.total,   # recipes matching the filters, across all pages
+        "pages": result.pages,   # number of pages (0 when nothing matches)
+    }, 200
 
 
 @app.route("/recipes", methods=["POST"])
