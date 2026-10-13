@@ -32,15 +32,22 @@ export default function NavBar() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-5">
+        {/* flex-wrap lets the links wrap onto two rows on narrow phones */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           {/* "end" makes My Recipes active only on "/", not on every page */}
           <NavLink to="/" end className={navLinkClass}>
             My Recipes
           </NavLink>
+          
+          <NavLink to="/swaps" className={navLinkClass}>
+            My Swaps
+          </NavLink>
+
           <NavLink to="/search" className={navLinkClass}>
             Find Recipes
           </NavLink>
           {/* White button on the pine header, so it reads as the main action */}
+          
           <Link
             to="/recipes/new"
             className="inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-pine-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"

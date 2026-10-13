@@ -9,6 +9,7 @@ import RecipeDetail from "./pages/RecipeDetail";
 import RecipeForm from "./pages/RecipeForm";
 import SearchPage from "./pages/SearchPage";
 import NotFound from "./pages/NotFound";
+import SwapsPage from "./pages/SwapsPage";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<RecipeList />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/swaps" element={<SwapsPage />} />
           <Route path="/recipes/new" element={<RecipeForm />} />
           <Route path="/recipes/:id" element={<RecipeDetail />} />
           <Route path="/recipes/:id/edit" element={<RecipeForm />} />
