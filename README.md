@@ -27,9 +27,13 @@ Built with React, Flask, and PostgreSQL for the Flatiron School Software Enginee
 
 ## Screenshots
 
-| Recipe detail | Find Recipes |
+| Recipe detail | Suggested swaps |
 |---|---|
-| ![Recipe detail with swaps](screenshots/recipe-detail.png) | ![Search results with gluten preview](screenshots/find-recipes.png) |
+| ![Recipe detail with rating and swap buttons](screenshots/recipe-detail.png) | ![Used before suggestions in the swap editor](screenshots/swap-suggestions.png) |
+
+| My Swaps | Find Recipes |
+|---|---|
+| ![My Swaps page](screenshots/my-swaps.png) | ![Search results with gluten preview](screenshots/find-recipes.png) |
 
 ## Tech Stack
 
