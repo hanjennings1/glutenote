@@ -190,6 +190,7 @@ GET /swaps?ingredient=plain flour
 ```
 
 ## Running Tests
+
 The backend has 68 tests covering gluten flagging, TheMealDB parsing, every API route, search, sort, and pagination, ratings, and swap suggestions. The tests use a temporary in-memory database and a fake TheMealDB, so they don't need PostgreSQL or an internet connection, and they never touch your saved recipes.
 
 ```bash
@@ -247,6 +248,7 @@ pytest
 - **Gluten flags are a guide.** Flagging uses keyword matching, so users can turn any flag on or off and should always check product labels.
 
 ## Future Improvements
+
 - Rate how well each individual swap worked, not just the whole recipe
 - A fourth status, *Proven*, for adapted recipes you've made and loved
 - A shopping list for a recipe that uses your gluten-free swaps
