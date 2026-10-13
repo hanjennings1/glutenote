@@ -6,19 +6,21 @@ Run from backend/ with the virtual environment active:
 The API then runs at http://localhost:5555
 
 Routes:
-  GET    /recipes            list recipes, one page at a time
-                             (optional ?status=, ?q=, ?sort=, ?page=, ?per_page=)
-  GET    /recipes/<id>       one recipe, including its ingredients
-  POST   /recipes            create a recipe (optionally with ingredients)
-  PATCH  /recipes/<id>       update some fields of a recipe
-  DELETE /recipes/<id>       delete a recipe (and its ingredients, via cascade)
+    GET    /recipes            list recipes, one page at a time
+                               (optional ?status=, ?q=, ?sort=, ?page=, ?per_page=)
+    GET    /recipes/<id>       one recipe, including its ingredients
+    POST   /recipes            create a recipe (optionally with ingredients)
+    PATCH  /recipes/<id>       update some fields of a recipe
+    DELETE /recipes/<id>       delete a recipe (and its ingredients, via cascade)
 
-  POST   /ingredients        add an ingredient to a recipe (needs recipe_id)
-  PATCH  /ingredients/<id>   update an ingredient (e.g. record a GF substitute)
-  DELETE /ingredients/<id>   delete an ingredient
+    POST   /ingredients        add an ingredient to a recipe (needs recipe_id)
+    PATCH  /ingredients/<id>   update an ingredient (e.g. record a GF substitute)
+    DELETE /ingredients/<id>   delete an ingredient
 
-  GET    /search?q=          search TheMealDB; returns previews with gluten flags (nothing saved)
-  POST   /recipes/import     fetch a recipe from TheMealDB, flag gluten, and save it
+    GET    /swaps              every recorded gluten-free swap, grouped
+                               (optional ?ingredient= to get suggestions for one ingredient)
+    GET    /search?q=          search TheMealDB; returns previews with gluten flags (nothing saved)
+    POST   /recipes/import     fetch a recipe from TheMealDB, flag gluten, and save it
 
 Error responses always use the shape {"error": "message"}
 so the React frontend can display them the same way everywhere.
@@ -30,6 +32,7 @@ from sqlalchemy.exc import IntegrityError
 from config import app, db
 from models import Recipe, Ingredient, GF_STATUSES
 from mealdb import search_meals, lookup_meal, parse_meal, MealDBError
+from gluten import gluten_keywords_in
 
 # Fields the frontend is allowed to set on a recipe.
 # Anything else in the request body (like "id") is ignored,
@@ -262,6 +265,50 @@ def delete_ingredient(id):
     db.session.delete(ingredient)
     db.session.commit()
     return {}, 204
+
+
+# ---------- Swaps ----------
+# A "swap" is an ingredient's gf_substitute. This route gathers the swaps saved
+# across all recipes, so the app can suggest ones that worked before.
+
+@app.route("/swaps", methods=["GET"])
+def get_swaps():
+    # Every flagged ingredient that has a swap recorded
+    swapped = (
+        Ingredient.query.filter(
+            Ingredient.contains_gluten.is_(True),
+            Ingredient.gf_substitute.isnot(None),
+            Ingredient.gf_substitute != "",
+        )
+        .all()
+    )
+
+    # Optional: only swaps for ingredients like this one, e.g. ?ingredient=plain flour.
+    # "Like" means the same name, or a shared gluten keyword ("plain flour" and
+    # "all-purpose flour" both contain "flour").
+    ingredient = request.args.get("ingredient", "").strip()
+    if ingredient:
+        name = ingredient.lower()
+        keywords = set(gluten_keywords_in(ingredient))
+        swapped = [
+            i for i in swapped
+            if i.name.strip().lower() == name or keywords & set(gluten_keywords_in(i.name))
+        ]
+
+    # Group identical swaps (same ingredient and substitute, ignoring capitalization)
+    # and list the recipes each one was used in.
+    groups = {}
+    for i in swapped:
+        key = (i.name.strip().lower(), i.gf_substitute.strip().lower())
+        group = groups.setdefault(key, {"ingredient": i.name, "substitute": i.gf_substitute, "recipes": []})
+        if all(r["id"] != i.recipe_id for r in group["recipes"]):
+            group["recipes"].append({"id": i.recipe.id, "title": i.recipe.title})
+
+    # Most-used swaps first, then A–Z by ingredient
+    swaps = sorted(groups.values(), key=lambda g: (-len(g["recipes"]), g["ingredient"].lower()))
+    for group in swaps:
+        group["times_used"] = len(group["recipes"])
+    return swaps, 200
 
 
 # ---------- TheMealDB: search and import ----------

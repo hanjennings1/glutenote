@@ -61,3 +61,18 @@ def may_contain_gluten(ingredient_name):
 
     # 2. Otherwise, flag it if any gluten keyword appears as a whole word.
     return any(pattern.search(name) for pattern in _KEYWORD_PATTERNS)
+
+def gluten_keywords_in(ingredient_name):
+    """ Rekturn the glten keywords found in an ingredient name, as whole words.
+    -
+    Used to suggest past swaps for similar ingredients:
+        gluten_keywords_in("Plain Flour")       ->  ["flour"]
+        gluten_keywords_in("al-purpose flour")  ->  ["flour"] (same keyword, so they match)
+    """
+    if not ingredient_name:
+        return[]
+    return [
+        word
+        for word, pattern in zip(GLUTEN_KEYWORDS, _KEYWORD_PATTERNS)
+        if pattern.search(ingredient_name)
+    ]
