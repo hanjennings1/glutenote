@@ -14,6 +14,9 @@ export const btn = {
   danger: `inline-flex items-center justify-center gap-1.5 rounded-md border border-error/30 bg-white px-4 py-2.5 text-sm font-medium text-error transition-colors hover:bg-error-bg disabled:opacity-50 ${focusRing}`,
   // Small text-style action, e.g. "+ Add swap"
   text: `inline-flex items-center gap-1 rounded-sm text-sm font-medium text-primary hover:underline underline-offset-2 ${focusRing}`,
+    // Small bordeaux pill for gluten actions, e.g. "+ Add swap" on a flagged ingredient.
+  // Bordeaux means gluten in the style guide, so only use this for gluten-related actions.
+  flag: `inline-flex items-center gap-1 rounded-full bg-flag-bg px-2.5 py-1 text-xs font-medium text-flag-text transition-colors hover:bg-flag/15 ${focusRing}`,
   // Small text-style destructive action, e.g. "Delete ingredient"
   textDanger: `inline-flex items-center gap-1 rounded-sm text-sm font-medium text-error hover:underline underline-offset-2 ${focusRing}`,
   // Square icon-only button, e.g. the edit pencil
