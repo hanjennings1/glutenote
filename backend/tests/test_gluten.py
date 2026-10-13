@@ -8,7 +8,7 @@ with no database, no Flask, and no internet needed.
 import pytest
 
 from gluten import may_contain_gluten
-
+from gluten import may_contain_gluten, gluten_keywords_in
 
 # @pytest.mark.parametrize runs the same test once for each value in the list,
 # so one short test checks many ingredients. Each one shows up separately in the results.
@@ -40,3 +40,10 @@ def test_does_not_flag_gluten_free_ingredients(name):
 @pytest.mark.parametrize("name", ["", None])
 def test_empty_name_is_not_flagged(name):
     assert may_contain_gluten(name) is False
+
+
+def test_gluten_keywords_in_finds_whole_word_keywords():
+    assert gluten_keywords_in("Plain Flour") == ["flour"]
+    assert gluten_keywords_in("whole wheat bread") == ["wheat", "bread"]
+    assert gluten_keywords_in("Kale") == []          # "ale" only counts as a whole word
+    assert gluten_keywords_in("") == []
