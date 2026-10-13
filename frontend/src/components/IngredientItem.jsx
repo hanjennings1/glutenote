@@ -13,6 +13,7 @@ import { useState } from "react";
 import { WheatOff, Pencil, Plus, CornerDownRight } from "lucide-react";
 import { apiFetch } from "../api";
 import { btn, inputOnSubtle, label } from "../ui";
+import SwapSuggestions from "./SwapSuggestions";
 
 export default function IngredientItem({ ingredient, onSaved, onDeleted }) {
   const [editing, setEditing] = useState(false);
@@ -204,6 +205,12 @@ function IngredientEditor({ ingredient, focusSwap, onCancel, onSaved, onDeleted 
             placeholder="e.g. 1:1 gluten-free flour blend"
             autoFocus={focusSwap}
             className={inputOnSubtle}
+          />
+          {/* Swaps that worked before for similar ingredients; a click fills in the field */}
+          <SwapSuggestions
+            ingredientName={ingredient.name}
+            currentSwap={form.gf_substitute}
+            onPick={(swap) => setForm((f) => ({ ...f, gf_substitute: swap }))}
           />
         </div>
       )}
