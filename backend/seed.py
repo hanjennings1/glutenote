@@ -7,11 +7,16 @@ Run from backend/ with the virtual environment active:
 WARNING: This deletes ALL existing recipes and ingredients first,
 so only use it on the development database.
 
-Includes one recipe for each gluten-free status, so the
-status filter can be tested:
+Includes recipes for each gluten-free status, so the status filter can be tested:
   - naturally_gf:   no gluten, no changes needed
   - adapted:        had gluten, every flagged ingredient has a substitute
   - needs_adapting: has flagged ingredients without substitutes yet
+
+Also shows off the newer features:
+  - ratings:         some recipes are rated, some aren't (try "Highest rated")
+  - My Swaps:        the flour swap is used in two recipes, so it's grouped
+  - suggested swaps: Lemon Bars has unswapped flour; click "Add swap" to see
+                     "Used before: 1:1 gluten-free flour blend"
 """
 
 from config import app, db
@@ -38,6 +43,7 @@ with app.app_context():
         source="custom",
         gf_status="naturally_gf",
         notes="Naturally gluten-free. Serve with GF toast for dipping.",
+        rating=5,
         ingredients=[
             Ingredient(name="olive oil", amount="2 tbsp"),
             Ingredient(name="onion", amount="1, diced"),
@@ -57,7 +63,8 @@ with app.app_context():
         ),
         source="custom",
         gf_status="adapted",
-        notes="1:1 GF flour blend worked well. Needed about 5 extra minutes in the oven.",
+        notes="1:1 GF flour blend worked well; just let the dough sit an extra 10 mins before putting in oven.",
+        rating=4,
         ingredients=[
             Ingredient(name="ripe bananas", amount="3"),
             Ingredient(name="butter", amount="1/3 cup, melted"),
@@ -92,9 +99,60 @@ with app.app_context():
         ],
     )
 
+    # 4. Adapted: uses the same flour swap as Banana Bread, plus an oats swap,
+    # so My Swaps shows the flour blend "used in 2 recipes".
+    apple_crumble = Recipe(
+        title="Apple Crumble",
+        instructions=(
+            "Toss sliced apples with sugar and cinnamon. Rub flour, oats, and butter "
+            "into a crumble, sprinkle over the apples, and bake at 375F for 40 minutes."
+        ),
+        source="custom",
+        gf_status="adapted",
+        notes="Certified GF oats are a must. Regular oats are often cross-contaminated.",
+        rating=5,
+        ingredients=[
+            Ingredient(name="apples", amount="6, sliced"),
+            Ingredient(name="sugar", amount="1/2 cup"),
+            Ingredient(name="cinnamon", amount="1 tsp"),
+            Ingredient(
+                name="all-purpose flour",
+                amount="3/4 cup",
+                contains_gluten=True,
+                gf_substitute="1:1 gluten-free flour blend",
+            ),
+            Ingredient(
+                name="rolled oats",
+                amount="3/4 cup",
+                contains_gluten=True,
+                gf_substitute="certified gluten-free oats",
+            ),
+            Ingredient(name="butter", amount="1/2 cup, cold"),
+        ],
+    )
+
+    # 5. Needs adapting: the flour has no swap yet. Clicking "Add swap" on it
+    # suggests the flour blend used in Banana Bread and Apple Crumble.
+    lemon_bars = Recipe(
+        title="Lemon Bars",
+        instructions=(
+            "Press a shortbread crust into a pan and bake 20 minutes. Whisk eggs, "
+            "sugar, lemon juice, and a little flour, pour over the crust, and bake 20 more."
+        ),
+        source="custom",
+        gf_status="needs_adapting",
+        ingredients=[
+            Ingredient(name="plain flour", amount="2 cups", contains_gluten=True),
+            Ingredient(name="butter", amount="1 cup, softened"),
+            Ingredient(name="sugar", amount="1 1/2 cups"),
+            Ingredient(name="eggs", amount="4"),
+            Ingredient(name="lemon juice", amount="2/3 cup"),
+        ],
+    )
+
     # Passing ingredients=[...] above links each Ingredient to its Recipe,
     # so adding the recipes also saves their ingredients.
-    db.session.add_all([shakshuka, banana_bread, teriyaki])
+    db.session.add_all([shakshuka, banana_bread, teriyaki, apple_crumble, lemon_bars])
     db.session.commit()
 
     print(f"Seeded {Recipe.query.count()} recipes and {Ingredient.query.count()} ingredients.")
