@@ -2,10 +2,11 @@
 //
 // Three looks (from the style guide):
 //   - Normal:            amount + name
-//   - Flagged, no swap:  name in bordeaux with a wheat-off icon, plus "+ Add swap"
-//   - Flagged, swapped:  name crossed out in bordeaux, with the gluten-free swap below it
+//   - Flagged, no swap:  name in bordeaux with a wheat-off icon, plus a "+ Add swap" button
+//   - Flagged, swapped:  name crossed out in bordeaux, the gluten-free swap below it,
+//                        plus a "Change swap" button
 //
-// Clicking "+ Add swap" or the pencil opens an inline editor for this row,
+// "+ Add swap", "Change swap", or the pencil opens an inline editor for this row,
 // which saves with PATCH /ingredients/<id> and deletes with DELETE /ingredients/<id>.
 
 import { useState } from "react";
@@ -70,21 +71,30 @@ export default function IngredientItem({ ingredient, onSaved, onDeleted }) {
         )}
       </div>
 
-      {flagged && !swap && (
-        <button type="button" onClick={() => openEditor(true)} className={`${btn.text} pt-0.5`}>
-          <Plus size={14} aria-hidden="true" />
-          Add swap
-        </button>
-      )}
+            {/* Swap buttons open the editor with the cursor in the swap field */}
+      <div className="flex shrink-0 items-center gap-2">
+        {flagged && !swap && (
+          <button type="button" onClick={() => openEditor(true)} className={btn.flag}>
+            <Plus size={14} aria-hidden="true" />
+            Add swap
+          </button>
+        )}
+        {flagged && swap && (
+          <button type="button" onClick={() => openEditor(true)} className={btn.text}>
+            Change swap
+          </button>
+        )}
 
-      <button
-        type="button"
-        onClick={() => openEditor(false)}
-        className={btn.icon}
-        aria-label={`Edit ${ingredient.name}`}
-      >
-        <Pencil size={15} aria-hidden="true" />
-      </button>
+        {/* The pencil edits everything about the ingredient */}
+        <button
+          type="button"
+          onClick={() => openEditor(false)}
+          className={btn.icon}
+          aria-label={`Edit ${ingredient.name}`}
+        >
+          <Pencil size={15} aria-hidden="true" />
+        </button>
+      </div>
     </li>
   );
 }
