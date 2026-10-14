@@ -6,6 +6,12 @@ Glutenote is a gluten-free recipe box. Save family recipes or find new ones on T
 
 Built with React, Flask, and PostgreSQL for the Flatiron School Software Engineering Capstone (Project 1).
 
+**Live demo:** https://glutenote.onrender.com
+
+> The demo runs on free hosting, so the first visit after a quiet spell can take up to a minute while the server wakes up. It's a shared single-user demo (no login), so anything you add or change is visible to other visitors.
+
+<br>
+
 ![My Recipes page](screenshots/my-recipes.png)
 
 ## Features
@@ -199,6 +205,13 @@ source venv/bin/activate
 pytest
 ```
 
+## Deployment
+
+- **Backend:** Render web service (root `backend`, start command `gunicorn app:app`)
+- **Frontend:** Render static site (root `frontend`, publish directory `dist`, with a `/*` → `/index.html` rewrite for React Router)
+- **Database:** Neon PostgreSQL
+- **Environment variables:** `DATABASE_URL` on the backend; `VITE_API_URL` (the backend URL) on the frontend
+
 ## Project Structure
 
 ```
@@ -254,8 +267,9 @@ pytest
 - A shopping list for a recipe that uses your gluten-free swaps
 - A printable recipe card showing the adapted version
 - Tags such as "weeknight" and a cook log of each time a recipe is made
-- Deploy the app so it can be tried without installing it
 
 ## Acknowledgments
 
 Recipe data and photos from [TheMealDB](https://www.themealdb.com/).
+
+Family recipe photos in the live demo from [Unsplash](https://unsplash.com/).
