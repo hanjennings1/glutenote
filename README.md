@@ -215,43 +215,44 @@ pytest
 ## Project Structure
 
 ```
-├── frontend/                      React + Vite frontend
-│   ├── index.html                 Page shell, title, fonts
-│   ├── package.json               Frontend dependencies and scripts
-│   ├── vite.config.js             Vite + Tailwind CSS setup
+├── frontend/                       React + Vite frontend
+│   ├── index.html                  Page shell, title, fonts
+│   ├── package.json                Frontend dependencies and scripts
+│   ├── vite.config.js              Vite + Tailwind CSS setup
 │   ├── public/
-│   │   └── favicon.svg            Glutenote browser-tab icon
+│   │   └── favicon.svg             Glutenote browser-tab icon
 │   └── src/
-│       ├── main.jsx               Starts React with the router
-│       ├── App.jsx                NavBar and page routes
-│       ├── api.js                 apiFetch helper for calling Flask
-│       ├── index.css              Tailwind theme: colors, fonts, radius
-│       ├── statuses.js            The 3 gluten-free statuses and labels
-│       ├── ui.js                  Shared button and input styles
-│       ├── components/            NavBar, RecipeCard, StatusBadge, StatusPicker, StarRating,
-│       │                          IngredientList, IngredientItem, AddIngredientForm,
-│       │                          SwapSuggestions, NotesEditor, SearchResult,
-│       │                          LoadingSpinner, ErrorMessage
+│       ├── main.jsx                Starts React with the router
+│       ├── App.jsx                 NavBar and page routes
+│       ├── api.js                  apiFetch helper for calling Flask
+│       ├── index.css               Tailwind theme: colors, fonts, radius
+│       ├── statuses.js             The 3 gluten-free statuses and labels
+│       ├── ui.js                   Shared button and input styles
+│       ├── components/             NavBar, RecipeCard, StatusBadge, StatusPicker, StarRating,
+│       │                           IngredientList, IngredientItem, AddIngredientForm,
+│       │                           SwapSuggestions, NotesEditor, SearchResult,
+│       │                           LoadingSpinner, ErrorMessage
 │       └── pages/
-│           ├── RecipeList.jsx     My Recipes: search, sort, filter, and pages
-│           ├── RecipeDetail.jsx   One recipe: ingredients, swaps, status, rating, notes
-│           ├── RecipeForm.jsx     Add or edit a recipe
-│           ├── SwapsPage.jsx      My Swaps: every recorded swap
-│           ├── SearchPage.jsx     Find Recipes (TheMealDB search)
-│           └── NotFound.jsx       404 page
-├── backend/                       Flask API
-│   ├── app.py                     API routes
-│   ├── config.py                  App, database, and CORS setup
-│   ├── models.py                  Recipe and Ingredient models
-│   ├── gluten.py                  Flags ingredients that may contain gluten
-│   ├── mealdb.py                  TheMealDB search and lookup
-│   ├── seed.py                    Adds sample recipes
-│   ├── migrations/                Database migrations (Flask-Migrate)
-│   ├── tests/                     pytest tests (68)
-│   ├── pytest.ini                 pytest settings
-│   ├── requirements.txt           Python dependencies
-│   └── .env.example               Template for environment variables
-├── screenshots/                   Images for this README
+│           ├── RecipeList.jsx      My Recipes: search, sort, filter, and pages
+│           ├── RecipeDetail.jsx    One recipe: ingredients, swaps, status, rating, notes
+│           ├── RecipeForm.jsx      Add or edit a recipe
+│           ├── SwapsPage.jsx       My Swaps: every recorded swap
+│           ├── SearchPage.jsx      Find Recipes (TheMealDB search)
+│           └── NotFound.jsx        404 page
+├── backend/                        Flask API
+│   ├── app.py                      API routes
+│   ├── config.py                   App, database, and CORS setup
+│   ├── models.py                   Recipe and Ingredient models
+│   ├── gluten.py                   Flags ingredients that may contain gluten
+│   ├── mealdb.py                   TheMealDB search and lookup
+│   ├── seed.py                     Adds sample recipes
+│   ├── migrations/                 Database migrations (Flask-Migrate)
+│   ├── tests/                      pytest tests (68)
+│   ├── pytest.ini                  pytest settings
+│   ├── requirements.txt            Python dependencies
+│   ├── sample_mealdb_response.json Example TheMealDB response, studied before building the import
+│   └── .env.example                Template for environment variables
+├── screenshots/                    Images for this README
 └── README.md
 ```
 
